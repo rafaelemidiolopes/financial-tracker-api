@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
-from schemas.users import UserCreate
+from schemas.users import UserCreate, UserLogin, TokenResponse
 from models.users import User
-from core.security import hash_password
+from core.security import hash_password, verify_password, create_access_token
+from fastapi import HTTPException
 
 def create_user(user: UserCreate, db: Session):
     password_hashed = hash_password(user.password)
@@ -15,3 +16,16 @@ def create_user(user: UserCreate, db: Session):
     db.refresh(new_user)
     
     return new_user
+
+def login_user(user_data: UserLogin, db: Session):
+    user = db.query(User).filter_by(email = user_data.email).first()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail='User not exists! ') 
+    
+    if not verify_password(user_data.password, user.password_hash):
+        raise HTTPException(status_code=401, detail='Invalid credentials! ')
+    
+    access_token = create_access_token({'sub': str(user.id)})
+    
+    return TokenResponse(access_token=access_token, token_type='bearer')
