@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas.users import UserCreate, UserLogin, TokenResponse
+from schemas.users import UserCreate, UserLogin, TokenResponse, UpdateUser
 from models.users import User
 from core.security import hash_password, verify_password, create_access_token
 from fastapi import HTTPException
@@ -29,3 +29,15 @@ def login_user(user_data: UserLogin, db: Session):
     access_token = create_access_token({'sub': str(user.id)})
     
     return TokenResponse(access_token=access_token, token_type='bearer')
+
+def update_me(new_data: UpdateUser, user: User, db: Session):
+    new_data_dict = new_data.model_dump(exclude_unset=True)
+    
+    for key, value in new_data_dict.items():
+        setattr(user, key, value)
+        
+    db.commit()
+    
+    db.refresh(user)
+    
+    return user

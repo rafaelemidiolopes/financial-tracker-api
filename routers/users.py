@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from schemas.users import UserCreate, UserResponse, TokenResponse, UserLogin
+from schemas.users import UserCreate, UserResponse, TokenResponse, UserLogin, UpdateUser
 from database import get_db
 from sqlalchemy.orm import Session
 from services.users import create_user as create_user_service
@@ -19,3 +19,7 @@ def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
 @router.get('/me', response_model=UserResponse)
 def get_me(current_user = Depends(get_current_user)):
     return current_user
+
+@router.patch('/me', response_model=UserResponse)
+def update_me(new_data: UpdateUser, current_user = Depends(get_current_user), db: Session = Depends(get_db)):
+    return users.update_me(new_data, current_user, db)
