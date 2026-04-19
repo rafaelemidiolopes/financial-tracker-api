@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from schemas.users import UserCreate, UserLogin, TokenResponse, UpdateUser
+from schemas.users import UserCreate, UserLogin, TokenResponse, UpdateUser, UpdatePassword
 from models.users import User
 from core.security import hash_password, verify_password, create_access_token
 from fastapi import HTTPException
@@ -36,6 +36,15 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
     for key, value in new_data_dict.items():
         setattr(user, key, value)
         
+    db.commit()
+    
+    db.refresh(user)
+    
+    return user
+
+def update_password(new_password: UpdatePassword, user: User, db: Session):
+    user.password_hash = hash_password(new_password.password)
+    
     db.commit()
     
     db.refresh(user)
