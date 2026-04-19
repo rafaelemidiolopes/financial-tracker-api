@@ -20,4 +20,6 @@ class UserLogin(BaseModel):
     
 class UpdateUser(BaseModel):
     email: EmailStr | None = None
+    
+class UpdatePassword(BaseModel):
     password: str | None = None
