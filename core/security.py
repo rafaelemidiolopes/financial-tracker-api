@@ -39,7 +39,7 @@ def create_access_token(user_data: dict):
 
 def get_current_user(db: Session = Depends(get_db), token = Depends(oauth2)):
     try:
-        payload = decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         
         user = db.query(User).filter_by(id = int(payload['sub'])).first()
 
@@ -47,12 +47,12 @@ def get_current_user(db: Session = Depends(get_db), token = Depends(oauth2)):
             raise HTTPException(status_code=404, detail='User not found! ')
     
     except ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail='token has expired', headers={'WWW-Autheticate': 'Bearer'})
+        raise HTTPException(status_code=401, detail='token has expired', headers={'WWW-Authenticate': 'Bearer'})
     
     except InvalidSignatureError:
-        raise HTTPException(status_code=401, detail='invalid signature token', headers={'WWW-Autheticate': 'Bearer'})
+        raise HTTPException(status_code=401, detail='invalid signature token', headers={'WWW-Authenticate': 'Bearer'})
     
     except DecodeError:
-        raise HTTPException(status_code=401, detail='invalid decode error', headers={'WWW-Autheticate': 'Bearer'})
+        raise HTTPException(status_code=401, detail='invalid decode error', headers={'WWW-Authenticate': 'Bearer'})
     
     return user
