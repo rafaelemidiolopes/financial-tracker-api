@@ -7,6 +7,11 @@ from fastapi import HTTPException
 def create_user(user: UserCreate, db: Session):
     password_hashed = hash_password(user.password)
     
+    email_exists = db.query(User).filter_by(email = user.email).first()
+    
+    if email_exists:
+        raise HTTPException(status_code=409, detail='Email already exists')
+    
     new_user = User(email = user.email, password_hash = password_hashed)
     
     db.add(new_user)
