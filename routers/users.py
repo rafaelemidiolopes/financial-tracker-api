@@ -7,11 +7,11 @@ from core.security import get_current_user
 
 router = APIRouter()
 
-@router.post('/users', response_model=UserResponse)
+@router.post('/user', response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return users.create_user(user, db)
 
-@router.post('/user', response_model=TokenResponse)
+@router.post('/login', response_model=TokenResponse)
 def login_user(user_data: UserLogin, db: Session = Depends(get_db)):
     return users.login_user(user_data, db)
 
