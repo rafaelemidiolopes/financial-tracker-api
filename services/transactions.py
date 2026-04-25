@@ -34,3 +34,13 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, db: Ses
     db.refresh(transaction)
     
     return transaction
+
+def delete_transaction(transaction_id: int, db: Session):
+    transaction = db.query(Transaction).filter_by(id = transaction_id).first()
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail='Transaction not found! ')
+    
+    db.delete(transaction)
+    
+    db.commit()
