@@ -13,8 +13,8 @@ class Transaction(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
     user: Mapped['User'] = relationship('User', back_populates='transactions')
-    type: Mapped[Type] = mapped_column(Enum(Type), nullable=False)
-    amount: Mapped[float] = mapped_column(Float, nullable=False)
-    category: Mapped[str] = mapped_column(String(50), nullable=False)
-    description: Mapped[str] = mapped_column(String(100))
+    type: Mapped[Type] = mapped_column(Enum(Type))
+    amount: Mapped[float] = mapped_column(Float)
+    category: Mapped[str] = mapped_column(String(50))
+    description: Mapped[str] = mapped_column(String(100), nullable=True)
     
