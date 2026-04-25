@@ -12,3 +12,6 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     db.refresh(new_transaction)
     
     return new_transaction
+
+def get_transactions(current_user, db: Session):
+    return db.query(Transaction).filter_by(user_id = current_user.id).all()
