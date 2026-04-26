@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Depends
-from schemas.transactions import TransactionCreate, TransactionResponse, TransactionUpdate
+from fastapi import APIRouter, Depends, Query
+from schemas.transactions import TransactionCreate, TransactionResponse, TransactionUpdate, TransactionFilters
 from database import get_db
 from sqlalchemy.orm import Session
 from services import transactions
@@ -13,8 +13,8 @@ def create_transaction(data: TransactionCreate, current_user = Depends(get_curre
     return transactions.create_transaction(current_user, data, db)
 
 @router.get('/transaction', response_model=list[TransactionResponse])
-def get_transactions(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return transactions.get_transactions(current_user, db)
+def get_transactions(filters: TransactionFilters = Depends(), current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return transactions.get_transactions(filters, current_user, db)
 
 @router.patch('/transaction/{transaction_id}', response_model=TransactionResponse)
 def update_transaction(transaction_id: int, new_data: TransactionUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

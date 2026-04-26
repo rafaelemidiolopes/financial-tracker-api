@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from models.transactions import Type
+import datetime
+from fastapi import Query
 
 class TransactionResponse(BaseModel):
     id: int
@@ -21,3 +23,10 @@ class TransactionUpdate(BaseModel):
     amount: float | None = None
     category: str | None = None
     description: str | None = None
+    
+class TransactionFilters(BaseModel):
+    type: Type | None = Query(None)
+    amount: float | None = Query(None)
+    category: str | None = Query(None)
+    min_amount: float | None = Query(None)
+    max_amount: float | None = Query(None)
