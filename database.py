@@ -12,12 +12,3 @@ DATABASE_URL = f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD'
 engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autoflush=False, autocommit=False, bind=engine)
-
-def get_db():
-    db = SessionLocal()
-    
-    try:
-        yield db
-        
-    finally:
-        db.close()
