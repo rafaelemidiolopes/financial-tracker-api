@@ -30,3 +30,4 @@ class TransactionFilters(BaseModel):
     category: str | None = Query(None)
     min_amount: float | None = Query(None)
     max_amount: float | None = Query(None)
+    start_date: datetime.datetime | None = Query(None)

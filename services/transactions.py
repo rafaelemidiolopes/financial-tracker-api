@@ -17,23 +17,22 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     return new_transaction
 
 def get_transactions(filters: TransactionFilters, current_user: User, db: Session):
-    query = db.query(Transaction).filter_by(user_id = current_user.id)
+    query = db.query(Transaction).filter_by(user_id=current_user.id)
     
     if filters.type:
-        if not Type(filters.type):       
-            raise HTTPException(status_code=422,
-                detail=f"Invalid type: '{filters.type}'. Must be 'income' or 'expense'.")
-            
-        query = query(Transaction).filter_by(type = filters.type)
+        query = query.filter_by(type=filters.type)
     
-    if filters.min_amount:
-        query = query(Transaction).filter(Transaction.amount >= filters.min_amount)
+    if filters.min_amount is not None:
+        query = query.filter(Transaction.amount >= filters.min_amount)
     
-    if filters.max_amount:
-        query = query(Transaction).filter(Transaction.amount <= filters.max_amount)
+    if filters.max_amount is not None:
+        query = query.filter(Transaction.amount <= filters.max_amount)
     
     if filters.category:
-        query = query(Transaction).filter_by(category = filters.category)
+        query = query.filter_by(category=filters.category)
+        
+    if filters.start_date:
+        query = query.filter(Transaction.created_at >= filters.start_date)
     
     return query.all()
 
