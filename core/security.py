@@ -3,7 +3,7 @@ from jwt import encode
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
-from config import SECRET_KEY, ALGORITHM, TOKEN_EXPIRE_TIME
+from core.config import SECRET_KEY, ALGORITHM, TOKEN_EXPIRE_TIME
 
 load_dotenv()
 

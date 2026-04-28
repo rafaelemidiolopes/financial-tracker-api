@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, Query
 from schemas.transactions import TransactionCreate, TransactionResponse, TransactionUpdate, TransactionFilters
-from core.dependencies import get_db
 from sqlalchemy.orm import Session
 from services import transactions
-from core.security import get_current_user
+from core.dependencies import get_current_user, get_db
 from models.users import User
 
 router = APIRouter()

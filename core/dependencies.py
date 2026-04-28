@@ -2,10 +2,9 @@ from database import SessionLocal
 from models.users import User
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from dependencies import get_db
 from jwt import decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
-from security import oauth2
-from config import SECRET_KEY, ALGORITHM
+from core.security import oauth2
+from core.config import SECRET_KEY, ALGORITHM
 
 def get_db():
     db = SessionLocal()
