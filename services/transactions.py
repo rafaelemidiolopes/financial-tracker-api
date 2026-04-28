@@ -34,8 +34,8 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
     if filters.start_date:
         query = query.filter(Transaction.created_at >= filters.start_date)
     
-    if filters.end_time:
-        query = query.filter(Transaction.created_at <= filters.end_time)
+    if filters.end_date:
+        query = query.filter(Transaction.created_at <= filters.end_date)
     
     return query.all()
 

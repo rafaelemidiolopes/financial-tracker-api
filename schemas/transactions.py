@@ -31,4 +31,4 @@ class TransactionFilters(BaseModel):
     min_amount: float | None = Query(None)
     max_amount: float | None = Query(None)
     start_date: datetime.datetime | None = Query(None)
-    end_time: datetime.datetime | None = Query(None)
+    end_date: datetime.datetime | None = Query(None)
