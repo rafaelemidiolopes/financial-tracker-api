@@ -1,0 +1,33 @@
+name: Pipeline
+
+on: [push]
+
+env:
+  # Referência correta para o "cofre" do GitHub
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  ALGORITHM: ${{ secrets.ALGORITHM }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Copia os arquivos do repositório
+      uses: actions/checkout@v4
+
+    - name: Configura o Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Instala o Poetry
+      # Este passo é essencial porque o Poetry não vem pré-instalado
+      run: pipx install poetry
+
+    - name: Instala as dependências do projeto
+      run: poetry install
+
+    - name: Executa os testes
+      # Garante que o ambiente virtual do Poetry seja usado
+      run: poetry run task test
