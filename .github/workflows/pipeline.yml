@@ -1,33 +1,41 @@
-name: Pipeline
+name: Python CI
 
-on: [push]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 env:
-  # Referência correta para o "cofre" do GitHub
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}
   ALGORITHM: ${{ secrets.ALGORITHM }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_PORT: ${{ secrets.DB_PORT }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Copia os arquivos do repositório
+    - name: Copia os arquivos
       uses: actions/checkout@v4
 
-    - name: Configura o Python
+    - name: Instala o Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.13'
+        python-version: '3.11'
 
     - name: Instala o Poetry
-      # Este passo é essencial porque o Poetry não vem pré-instalado
-      run: pipx install poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
 
-    - name: Instala as dependências do projeto
+    - name: Instala as dependencias do projeto
       run: poetry install
 
     - name: Executa os testes
-      # Garante que o ambiente virtual do Poetry seja usado
-      run: poetry run task test
+      run: poetry run pytest
