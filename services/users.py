@@ -36,6 +36,12 @@ def login_user(user_data: UserLogin, db: Session):
     return TokenResponse(access_token=access_token, token_type='bearer')
 
 def update_me(new_data: UpdateUser, user: User, db: Session):
+    if new_data.email:
+        new_email_exists = db.query(User).filter_by(email = new_data.email).first()
+    
+        if new_email_exists:
+            raise HTTPException(status_code=409, detail='Email already exists')
+        
     new_data_dict = new_data.model_dump(exclude_unset=True)
     
     for key, value in new_data_dict.items():
