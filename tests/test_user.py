@@ -49,3 +49,15 @@ def test_login_wrong_password(mock_password):
     
     with pytest.raises(HTTPException):
         login_user(user, fake_db)
+        
+@patch('services.users.verify_password')
+def test_login_success(mock_password):
+    fake_db = MagicMock()
+    
+    fake_db.query.return_value.filter_by.return_value.first.return_value = MagicMock()
+    
+    user = UserLogin(email='abc@test.com', password='123')
+    
+    mock_password.return_value = True 
+    
+    assert login_user(user, fake_db) is not None
