@@ -39,7 +39,7 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
     if new_data.email:
         new_email_exists = db.query(User).filter_by(email = new_data.email).first()
     
-        if new_email_exists:
+        if new_email_exists and new_email_exists.id != user.id:
             raise HTTPException(status_code=409, detail='Email already exists')
         
     new_data_dict = new_data.model_dump(exclude_unset=True)
