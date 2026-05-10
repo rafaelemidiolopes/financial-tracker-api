@@ -1,6 +1,6 @@
-from services.users import create_user, login_user
+from services.users import create_user, login_user, update_me
 from unittest.mock import MagicMock, patch
-from schemas.users import UserCreate, UserLogin
+from schemas.users import UserCreate, UserLogin, UpdateUser
 from fastapi import HTTPException
 import pytest
 from models.users import User
@@ -61,3 +61,21 @@ def test_login_success(mock_password):
     mock_password.return_value = True 
     
     assert login_user(user, fake_db) is not None
+    
+def test_update_user_with_email_from_another_user():
+    fake_db = MagicMock() 
+    
+    fake_user = MagicMock()
+    
+    fake_user_email = MagicMock()
+    
+    fake_user_email.id = 2
+    
+    fake_db.query.return_value.filter_by.return_value.first.return_value = fake_user_email
+    
+    fake_user.id = 1
+    
+    user_new_data = UpdateUser(email = 'abc@test.com')
+    
+    with pytest.raises(HTTPException):
+        update_me(user_new_data, fake_user, fake_db)
