@@ -1,6 +1,6 @@
-from services.users import create_user, login_user, update_me
+from services.users import create_user, login_user, update_me, update_password
 from unittest.mock import MagicMock, patch
-from schemas.users import UserCreate, UserLogin, UpdateUser
+from schemas.users import UserCreate, UserLogin, UpdateUser, UpdatePassword
 from fastapi import HTTPException
 import pytest
 from models.users import User
@@ -92,3 +92,17 @@ def test_update_me_success():
     result = update_me(fake_new_data, fake_user, fake_db)
     
     assert result.email == 'new_email@test.com'  
+    
+@patch('services.users.hash_password')   
+def test_update_password(mock_hash_password):
+    fake_user = User(password_hash = 'old_password')
+    
+    mock_hash_password.return_value = 'new_password'
+
+    fake_new_password = UpdatePassword(password = 'new_password')
+    
+    fake_db = MagicMock()
+    
+    result = update_password(fake_new_password, fake_user, fake_db)
+    
+    assert result.password_hash == 'new_password'
