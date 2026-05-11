@@ -79,3 +79,16 @@ def test_update_user_with_email_from_another_user():
     
     with pytest.raises(HTTPException):
         update_me(user_new_data, fake_user, fake_db)
+           
+def test_update_me_success():
+    fake_db = MagicMock()
+    
+    fake_user = User(id = 1, email = 'old_email@test.com')
+    
+    fake_new_data = UpdateUser(email = 'new_email@test.com')
+    
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
+    
+    result = update_me(fake_new_data, fake_user, fake_db)
+    
+    assert result.email == 'new_email@test.com'  
