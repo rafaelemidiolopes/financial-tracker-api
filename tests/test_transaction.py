@@ -38,3 +38,17 @@ def test_get_transactions_success_case():
     result = get_transactions(fake_filters, fake_user, fake_db)
     
     assert result[0] == 'fake_transaction'
+    
+def test_get_transations_without_filters_success_case():
+    fake_db = MagicMock()
+    
+    fake_filters = TransactionFilters()
+    
+    fake_user = MagicMock()
+    fake_user.id = 1
+    
+    fake_db.query.return_value.filter_by.return_value.all.return_value = ['fake transaction']
+    
+    result = get_transactions(fake_filters, fake_user, fake_db)
+    
+    assert result[0] == 'fake transaction'
