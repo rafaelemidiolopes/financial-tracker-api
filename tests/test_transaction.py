@@ -1,4 +1,6 @@
 from unittest.mock import MagicMock
+import pytest
+from fastapi import HTTPException
 from services.transactions import create_transaction, get_transactions, update_transaction
 from schemas.transactions import TransactionCreate, TransactionFilters, TransactionUpdate
 
@@ -65,3 +67,15 @@ def test_update_transaction_success_case():
     result = update_transaction(fake_transaction_id, fake_data, fake_db)
     
     assert result.category == 'fake category'
+    
+def test_update_transaction_inexistent_transaction_case():
+    fake_db = MagicMock()
+    
+    fake_transaction_id = 1
+    
+    fake_data = TransactionUpdate(category = 'fake category')
+    
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
+    
+    with pytest.raises(HTTPException):
+        update_transaction(fake_transaction_id, fake_data, fake_db)
