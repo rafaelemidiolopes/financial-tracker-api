@@ -92,3 +92,11 @@ def test_delete_transaction_success_case():
     fake_db.delete.assert_called_once()
     
     fake_db.commit.assert_called_once()
+    
+def test_delete_inexistent_transaction_case():
+    fake_db = MagicMock()
+    
+    fake_db.query.return_value.filter_by.return_value.first.return_value = None
+    
+    with pytest.raises(HTTPException):
+        delete_transaction(1, fake_db)
