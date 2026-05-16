@@ -1,7 +1,11 @@
 from fastapi.testclient import TestClient
 from main import app
+from database import get_db
+from test_database import override_get_db
 
 client = TestClient(app)
+
+app.dependency_overrides[get_db] = override_get_db
 
 def test_create_user_success_case():
     response = client.post('/user', json = {"email": "test_email@test.com", "password": "123"})
