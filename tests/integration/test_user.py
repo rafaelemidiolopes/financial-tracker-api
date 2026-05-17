@@ -26,3 +26,9 @@ def test_login_user_success_case():
     
     assert response.status_code == 200
     assert response.json()['token_type'] == 'bearer'
+    
+def test_login_with_inexistent_email_case():
+    response = client.post('/login', json = {"email": "inexistent_email@test.com", "password": "321"})
+    
+    assert response.status_code == 404
+    assert response.json()['detail'] == 'User not exists! '
