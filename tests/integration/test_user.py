@@ -52,11 +52,18 @@ def test_update_me_success_case():
 def test_update_me_email_already_existing_case():
     response_login = client.post('/login', json = {"email": "new_email@test.com", "password": "123"})
     
-    assert response_login.status_code == 200
-    
     access_token = response_login.json()["access_token"]
     
     response_update_me = client.patch('/me', json = {"email": "email_user_test@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
     
     assert response_update_me.status_code == 409
     assert response_update_me.json()['detail'] == 'Email already exists'
+     
+def test_update_password_success_case():
+    response_login = client.post('/login', json = {"email": "new_email@test.com", "password": "123"})
+    
+    access_token = response_login.json()["access_token"]
+    
+    response_update_password = client.patch('/me/password', json = {"password": "543210"}, headers = {"Authorization": f'Bearer {access_token}'})
+    
+    assert response_update_password.status_code == 200
