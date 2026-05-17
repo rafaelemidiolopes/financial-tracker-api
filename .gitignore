@@ -212,3 +212,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
  3978e5a59aa17b00a631946fb56223352a60352b
+
+
+test_database.db

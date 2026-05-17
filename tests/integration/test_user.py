@@ -20,3 +20,9 @@ def test_create_user_with_email_existing_case():
     
     assert response.status_code == 409
     assert response.json()["detail"] == 'Email already exists'
+    
+def test_login_user_success_case():
+    response = client.post('/login', json = {"email": "test_email@test.com", "password": "123"})
+    
+    assert response.status_code == 200
+    assert response.json()['token_type'] == 'bearer'
