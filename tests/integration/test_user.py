@@ -38,3 +38,13 @@ def test_login_with_wrong_password():
     
     assert response.status_code == 401
     assert response.json()['detail'] == 'Invalid credentials! '
+    
+def test_update_me_success_case():
+    response_login = client.post('/login', json = {"email": "test_email@test.com", "password": "123"})
+    
+    access_token = response_login.json()["access_token"]
+    
+    response_update_me = client.patch('/me', json = {"email": "new_email@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
+    
+    assert response_update_me.status_code == 200
+    assert response_update_me.json()["email"] == "new_email@test.com"
