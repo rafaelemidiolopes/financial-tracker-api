@@ -2,6 +2,9 @@ from fastapi.testclient import TestClient
 from main import app
 from core.dependencies import get_db
 from tests.integration.test_database import override_get_db
+from faker import Faker
+
+faker = Faker()
 
 client = TestClient(app)
 
@@ -40,30 +43,42 @@ def test_login_with_wrong_password():
     assert response.json()['detail'] == 'Invalid credentials! '
     
 def test_update_me_success_case():
-    response_login = client.post('/login', json = {"email": "test_email@test.com", "password": "123"})
+    email = create_user_with_fake_email()
     
-    access_token = response_login.json()["access_token"]
+    access_token = get_access_token(email, "123")
     
-    response_update_me = client.patch('/me', json = {"email": "new_email@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
+    response = client.patch('/me', json = {"email": "new_email@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
     
-    assert response_update_me.status_code == 200
-    assert response_update_me.json()["email"] == "new_email@test.com"
+    assert response.status_code == 200
+    assert response.json()["email"] == "new_email@test.com"
     
-def test_update_me_email_already_existing_case():
-    response_login = client.post('/login', json = {"email": "new_email@test.com", "password": "123"})
+def test_update_me_email_already_existing_case():   
+    email = create_user_with_fake_email()
     
-    access_token = response_login.json()["access_token"]
+    access_token = get_access_token(email, "123")
     
-    response_update_me = client.patch('/me', json = {"email": "email_user_test@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
+    response = client.patch('/me', json = {"email": "email_user_test@test.com"}, headers = {"Authorization": f'Bearer {access_token}'})
     
-    assert response_update_me.status_code == 409
-    assert response_update_me.json()['detail'] == 'Email already exists'
+    assert response.status_code == 409
+    assert response.json()['detail'] == 'Email already exists'
      
 def test_update_password_success_case():
-    response_login = client.post('/login', json = {"email": "new_email@test.com", "password": "123"})
+    email = create_user_with_fake_email()
     
-    access_token = response_login.json()["access_token"]
+    access_token = get_access_token(email, "123")
     
-    response_update_password = client.patch('/me/password', json = {"password": "543210"}, headers = {"Authorization": f'Bearer {access_token}'})
+    response = client.patch('/me/password', json = {"password": "543210"}, headers = {"Authorization": f'Bearer {access_token}'})
     
-    assert response_update_password.status_code == 200
+    assert response.status_code == 200
+
+def get_access_token(email, password):
+    response = client.post('/login', json = {"email": email, "password": password})
+                               
+    return response.json()["access_token"]
+
+def create_user_with_fake_email():
+    fake_email = faker.email()
+    
+    client.post('/user', json = {"email": fake_email, "password": "123"})
+    
+    return fake_email
