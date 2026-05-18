@@ -31,3 +31,13 @@ def test_get_transaction_success_case():
     assert response.json()[-1]['amount'] == 500
     assert response.json()[-1]['category'] == 'fake category'
     assert response.json()[-1]['description'] == 'fake description'
+    
+def test_get_transactions_without_transactions_case():
+    email = create_user_with_fake_email()
+    
+    access_token = get_access_token(email, '123')
+    
+    response = client.get('/transaction', headers = {"Authorization": f"Bearer {access_token}"})
+    
+    assert response.status_code == 200
+    assert response.json() == []
