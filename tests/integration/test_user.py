@@ -41,7 +41,9 @@ def test_login_with_inexistent_email_case():
     assert response.json()['detail'] == 'User not exists! '
     
 def test_login_with_wrong_password():
-    response = client.post('/login', json = {"email": "test_email@test.com", "password": "12345"})
+    email = create_user_with_fake_email()
+    
+    response = client.post('/login', json = {"email": email, "password": "12345"})
     
     assert response.status_code == 401
     assert response.json()['detail'] == 'Invalid credentials! '
