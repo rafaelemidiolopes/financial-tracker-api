@@ -54,3 +54,13 @@ def test_update_transaction_success_case():
     assert response_update_transaction.json()["amount"] == 999
     assert response_update_transaction.json()["category"] == "new fake category"
     assert response_update_transaction.status_code == 200
+    
+def test_update_inexistent_transaction_case():
+    email = create_user_with_fake_email()
+    
+    access_token = get_access_token(email, '123')
+    
+    response = client.patch('/transaction/999999999999', json = {"amount": 600}, headers = {"Authorization": f"Bearer {access_token}"})
+    
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Transaction not found! "
