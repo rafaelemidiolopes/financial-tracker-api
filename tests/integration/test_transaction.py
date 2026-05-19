@@ -75,3 +75,13 @@ def test_delete_transaction_success_case():
     response_delete_transaction = client.delete(f'/transaction/{response_create_transaction.json()["id"]}', headers = {"Authorization": f"Bearer {access_token}"})
     
     assert response_delete_transaction.status_code == 204
+    
+def test_delete_inexistent_transaction_case():
+    email = create_user_with_fake_email()
+    
+    access_token = get_access_token(email, '123')
+    
+    response = client.delete('/transaction/9999999999999', headers = {"Authorization": f"Bearer {access_token}"})
+    
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Transaction not found! "
