@@ -41,3 +41,16 @@ def test_get_transactions_without_transactions_case():
     
     assert response.status_code == 200
     assert response.json() == []
+    
+def test_update_transaction_success_case():
+    email = create_user_with_fake_email()
+    
+    access_token = get_access_token(email, '123')
+    
+    response_post_transaction = client.post('/transaction', json = {"type": "income", "amount": 500, "category": "fake category", "description": "fake description"}, headers = {"Authorization": f'Bearer {access_token}'})
+    
+    response_update_transaction = client.patch(f'/transaction/{response_post_transaction.json()["id"]}', json = {"amount": 999, "category": "new fake category"}, headers = {"Authorization": f"Bearer {access_token}"})
+    
+    assert response_update_transaction.json()["amount"] == 999
+    assert response_update_transaction.json()["category"] == "new fake category"
+    assert response_update_transaction.status_code == 200
