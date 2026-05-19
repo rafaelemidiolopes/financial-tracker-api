@@ -17,7 +17,7 @@ def get_transactions(filters: TransactionFilters = Depends(), current_user: User
 
 @router.patch('/transaction/{transaction_id}', response_model=TransactionResponse)
 def update_transaction(transaction_id: int, new_data: TransactionUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return transactions.update_transaction(transaction_id, new_data, db)
+    return transactions.update_transaction(transaction_id, new_data, current_user, db)
 
 @router.delete('/transaction/{transaction_id}', status_code=204)
 def delete_transaction(transaction_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):

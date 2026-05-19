@@ -39,7 +39,7 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
     
     return query.all()
 
-def update_transaction(transaction_id: int, new_data: TransactionUpdate, db: Session):
+def update_transaction(transaction_id: int, new_data: TransactionUpdate, current_user: User, db: Session):
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
     
     if not transaction:

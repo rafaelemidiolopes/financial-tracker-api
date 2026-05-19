@@ -58,18 +58,22 @@ def test_get_transations_without_filters_success_case():
 def test_update_transaction_success_case():
     fake_db = MagicMock()
     
+    fake_user = MagicMock()
+    
     fake_transaction_id = 1
     
     fake_data = TransactionUpdate(category = 'fake category')
     
     fake_db.query.return_value.filter_by.return_value.first.return_value = MagicMock()
     
-    result = update_transaction(fake_transaction_id, fake_data, fake_db)
+    result = update_transaction(fake_transaction_id, fake_data, fake_user, fake_db)
     
     assert result.category == 'fake category'
     
 def test_update_transaction_inexistent_transaction_case():
     fake_db = MagicMock()
+    
+    fake_user = MagicMock()
     
     fake_transaction_id = 1
     
@@ -78,7 +82,7 @@ def test_update_transaction_inexistent_transaction_case():
     fake_db.query.return_value.filter_by.return_value.first.return_value = None
     
     with pytest.raises(HTTPException):
-        update_transaction(fake_transaction_id, fake_data, fake_db)
+        update_transaction(fake_transaction_id, fake_data, fake_user, fake_db)
         
 def test_delete_transaction_success_case():
     fake_db = MagicMock()
