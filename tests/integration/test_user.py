@@ -60,7 +60,7 @@ def test_update_me_success_case():
     assert response.status_code == 200
     assert response.json()["email"] == new_fake_email
     
-def test_update_me_email_already_existing_case():   
+def test_create_user_email_already_exists():   
     email = create_user_with_fake_email()
     
     access_token = get_access_token(email, "123")
