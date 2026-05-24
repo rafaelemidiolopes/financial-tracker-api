@@ -6,7 +6,7 @@ class User(Base):
     __tablename__ = 'users'
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(45), unique=True, nullable=False)
     transactions: Mapped[list['Transaction']] = relationship('Transaction', back_populates='user')
     password_hash: Mapped[str] = mapped_column(String(300))
     is_active: Mapped[bool] = mapped_column(default=True)
