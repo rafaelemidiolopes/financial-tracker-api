@@ -8,14 +8,21 @@ from loguru import logger
 
 def create_transaction(current_user, data: TransactionCreate, db: Session):
     new_transaction = Transaction(user_id= current_user.id, type = data.type, amount = data.amount, category = data.category, description = data.description)
+    try:
+        db.add(new_transaction)
+        
+        db.commit()
     
-    db.add(new_transaction)
+        db.refresh(new_transaction)
+        
+        logger.info(f'Transaction created. Id transaction: {new_transaction.id}. User id: {new_transaction.user_id}')
     
-    db.commit()
-    
-    logger.info(f'Transaction created. Id transaction: {new_transaction.id}. User id: {new_transaction.user_id}')
-    
-    db.refresh(new_transaction)
+    except Exception:
+        db.rollback()
+        
+        logger.exception('Error creating transaction.')
+        
+        raise
     
     return new_transaction
 
