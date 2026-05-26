@@ -27,27 +27,37 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     return new_transaction
 
 def get_transactions(filters: TransactionFilters, current_user: User, db: Session):
-    query = db.query(Transaction).filter_by(user_id=current_user.id)
-    
-    if filters.type:
-        query = query.filter_by(type=filters.type)
-    
-    if filters.min_amount is not None:
-        query = query.filter(Transaction.amount >= filters.min_amount)
-    
-    if filters.max_amount is not None:
-        query = query.filter(Transaction.amount <= filters.max_amount)
-    
-    if filters.category:
-        query = query.filter_by(category=filters.category)
+    try:
+        query = db.query(Transaction).filter_by(user_id=current_user.id)
         
-    if filters.start_date:
-        query = query.filter(Transaction.created_at >= filters.start_date)
+        if filters.type:
+            query = query.filter_by(type=filters.type)
+        
+        if filters.min_amount is not None:
+            query = query.filter(Transaction.amount >= filters.min_amount)
+        
+        if filters.max_amount is not None:
+            query = query.filter(Transaction.amount <= filters.max_amount)
+        
+        if filters.category:
+            query = query.filter_by(category=filters.category)
+            
+        if filters.start_date:
+            query = query.filter(Transaction.created_at >= filters.start_date)
+        
+        if filters.end_date:
+            query = query.filter(Transaction.created_at <= filters.end_date)
+        
+        transactions = query.all()
+        
+        logger.info(f'Transactions fetched for user {current_user.id}')
+        
+        return transactions
     
-    if filters.end_date:
-        query = query.filter(Transaction.created_at <= filters.end_date)
-    
-    return query.all()
+    except Exception:
+        logger.exception('Error when viewing transactions')
+        
+        raise
 
 def update_transaction(transaction_id: int, new_data: TransactionUpdate, current_user: User, db: Session):
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
