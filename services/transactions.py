@@ -4,6 +4,7 @@ from models.transactions import Transaction
 from models.users import User
 from fastapi import HTTPException
 from models.transactions import Type
+from loguru import logger
 
 def create_transaction(current_user, data: TransactionCreate, db: Session):
     new_transaction = Transaction(user_id= current_user.id, type = data.type, amount = data.amount, category = data.category, description = data.description)
@@ -11,6 +12,8 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     db.add(new_transaction)
     
     db.commit()
+    
+    logger.info(f'Transaction created. Id transaction: {new_transaction.id}. User id: {new_transaction.user_id}')
     
     db.refresh(new_transaction)
     
