@@ -20,7 +20,7 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception('Error creating transaction.')
+        logger.exception(f'Error creating transaction. User: {current_user.id}.')
         
         raise
     
@@ -50,12 +50,12 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
         
         transactions = query.all()
         
-        logger.info(f'Transactions fetched for user {current_user.id}')
+        logger.info(f'{len(transactions)} transactions fetched for user {current_user.id}')
         
         return transactions
     
     except Exception:
-        logger.exception('Error when viewing transactions')
+        logger.exception(f'Error when viewing transactions! User: {current_user.id}')
         
         raise
 
@@ -63,16 +63,28 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
     
     if not transaction:
+        logger.warning(f'Transaction not found! User: {current_user.id}')
+        
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
     dict_new_data = new_data.model_dump(exclude_unset=True)
     
     for field, value in dict_new_data.items():
         setattr(transaction, field, value)
-        
-    db.commit()
     
-    db.refresh(transaction)
+    try:     
+        db.commit()
+        
+        db.refresh(transaction)
+        
+        logger.info(f'Transaction {transaction.id} updated by user {current_user.id}!')
+        
+    except Exception:
+        db.rollback()
+        
+        logger.exception(f'Error when updating transaction. User: {current_user.id}')
+        
+        raise
     
     return transaction
 
@@ -80,8 +92,20 @@ def delete_transaction(transaction_id: int, db: Session):
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
     
     if not transaction:
+        logger.warning('Transaction not found! ')
+        
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
-    db.delete(transaction)
+    try: 
+        db.delete(transaction)
+        
+        db.commit()
+        
+    except Exception:
+        db.rollback()
+        
+        logger.exception('Error when delete transaction')
+        
+        raise
     
-    db.commit()
+    logger.info('Transaction deleted! ')
