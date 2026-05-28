@@ -63,7 +63,7 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
     
     if not transaction:
-        logger.warning(f'Transaction not found! User: {current_user.id}')
+        logger.warning(f'Transaction {transaction_id} not found! User: {current_user.id}')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
@@ -88,11 +88,11 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
     
     return transaction
 
-def delete_transaction(transaction_id: int, db: Session):
+def delete_transaction(transaction_id: int, current_user: User, db: Session):
     transaction = db.query(Transaction).filter_by(id = transaction_id).first()
     
     if not transaction:
-        logger.warning('Transaction not found! ')
+        logger.warning(f'Transaction {transaction_id} not found! User: {current_user.id}')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
@@ -104,8 +104,8 @@ def delete_transaction(transaction_id: int, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception('Error when delete transaction')
+        logger.exception(f'Error when delete transaction {transaction.id}. User: {current_user.id}')
         
         raise
     
-    logger.info('Transaction deleted! ')
+    logger.info(f'Transaction {transaction.id} deleted by {current_user.id}! ')
