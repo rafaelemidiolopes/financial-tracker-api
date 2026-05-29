@@ -17,11 +17,19 @@ def create_user(user: UserCreate, db: Session):
     
     new_user = User(email = user.email, password_hash = password_hashed)
     
-    db.add(new_user)
-    
-    db.commit()
-    
-    db.refresh(new_user)
+    try:
+        db.add(new_user)
+        
+        db.commit()
+        
+        db.refresh(new_user)
+        
+    except Exception:
+        db.rollback()
+        
+        logger.exception('Creating user failed.')
+        
+        raise
     
     logger.info(f'User created. Id user: {new_user.id}')
     
@@ -33,7 +41,7 @@ def login_user(user_data: UserLogin, db: Session):
     if not user:
         logger.warning(f'Login failed. Email {user_data.email} not found.')
         
-        raise HTTPException(status_code=404, detail='User not exists! ') 
+        raise HTTPException(status_code=404, detail='Invalid credentials') 
     
     if not verify_password(user_data.password, user.password_hash):
         logger.warning(f'Login failed. Invalid credentials for user {user.id}')
@@ -60,9 +68,17 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
     for key, value in new_data_dict.items():
         setattr(user, key, value)
         
-    db.commit()
-    
-    db.refresh(user)
+    try:  
+        db.commit()
+        
+        db.refresh(user)
+        
+    except Exception:
+        db.rollback()
+        
+        logger.exception(f'Update user failed. User id: {user.id}')
+        
+        raise
     
     logger.info(f'User {user.id} updated')
     
@@ -71,9 +87,17 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
 def update_password(new_password: UpdatePassword, user: User, db: Session):
     user.password_hash = hash_password(new_password.password)
     
-    db.commit()
-    
-    db.refresh(user)
+    try:
+        db.commit()
+        
+        db.refresh(user)
+        
+    except Exception:
+        db.rollback()
+        
+        logger.exception(f'Update password failed. User id: {user.id}')
+        
+        raise
     
     logger.info(f'Password updated by user {user.id}')
     
