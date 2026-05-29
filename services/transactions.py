@@ -60,10 +60,10 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
         raise
 
 def update_transaction(transaction_id: int, new_data: TransactionUpdate, current_user: User, db: Session):
-    transaction = db.query(Transaction).filter_by(id = transaction_id).first()
+    transaction = db.query(Transaction).filter_by(id = transaction_id, user_id = current_user.id).first()
     
     if not transaction:
-        logger.warning(f'Transaction {transaction_id} not found! User: {current_user.id}')
+        logger.warning(f'Transaction {transaction_id} not found for user {current_user.id}')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
@@ -89,10 +89,10 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
     return transaction
 
 def delete_transaction(transaction_id: int, current_user: User, db: Session):
-    transaction = db.query(Transaction).filter_by(id = transaction_id).first()
+    transaction = db.query(Transaction).filter_by(id = transaction_id, user_id = current_user.id).first()
     
     if not transaction:
-        logger.warning(f'Transaction {transaction_id} not found! User: {current_user.id}')
+        logger.warning(f'Transaction {transaction_id} not found for user {current_user.id}')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
