@@ -5,6 +5,7 @@ from models.users import User
 from models.transactions import Transaction
 from database import Base, engine
 from contextlib import asynccontextmanager
+import logger_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

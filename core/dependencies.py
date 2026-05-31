@@ -23,7 +23,7 @@ def get_current_user(db: Session = Depends(get_db), token = Depends(oauth2)):
         user = db.query(User).filter_by(id = int(payload['sub'])).first()
 
         if not user:
-            logger.warning(f'Error when getting current user. User {payload['sub']} not found')
+            logger.warning(f'Error when getting current user. User {payload["sub"]} not found')
             
             raise HTTPException(status_code=404, detail='User not found! ')
     
