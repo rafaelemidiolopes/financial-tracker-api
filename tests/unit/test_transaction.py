@@ -87,11 +87,13 @@ def test_update_transaction_inexistent_transaction_case():
 def test_delete_transaction_success_case():
     fake_db = MagicMock()
     
+    fake_user = MagicMock()
+    
     fake_transaction_id = 1
     
     fake_db.query.return_value.filter_by.return_value.first.return_value = MagicMock()
 
-    delete_transaction(fake_transaction_id, fake_db)
+    delete_transaction(fake_transaction_id, fake_user, fake_db)
     
     fake_db.delete.assert_called_once()
     
@@ -100,7 +102,9 @@ def test_delete_transaction_success_case():
 def test_delete_inexistent_transaction_case():
     fake_db = MagicMock()
     
+    fake_user = MagicMock()
+    
     fake_db.query.return_value.filter_by.return_value.first.return_value = None
     
     with pytest.raises(HTTPException):
-        delete_transaction(1, fake_db)
+        delete_transaction(1, fake_user, fake_db)
