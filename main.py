@@ -7,6 +7,12 @@ from database import Base, engine
 from contextlib import asynccontextmanager
 import logger_config
 import uuid
+from prometheus_client import Counter, Histogram
+import time
+
+requests_count = Counter('total_requests', 'number of total requests')
+
+requests_duration = Histogram('requests_duration', 'requests time duration')
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,13 +31,21 @@ async def add_request_id(request: Request, call_next):
 
     with logger_config.logger.contextualize(request_id = request_id):
         logger_config.logger.info(f'Request started. Request method: {request.method}. Request url: {request.url.path}.')
+        
+        start_endpoint_time = time.time()
     
         response = await call_next(request)
+        
+        request_duration = time.time() - start_endpoint_time
         
         response.headers["X-Request-ID"] = request_id
         
         logger_config.logger.info(f'Request finished. Request method: {request.method}. Request url: {request.url.path}. Status code: {response.status_code}')
-        
+    
+    requests_duration.observe(request_duration)
+    
+    requests_count.inc()
+    
     return response
 
 app.include_router(transaction_router)
