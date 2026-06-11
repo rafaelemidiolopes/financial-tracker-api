@@ -10,9 +10,9 @@ import uuid
 from prometheus_client import Counter, Histogram
 import time
 
-requests_count = Counter('total_requests', 'number of total requests')
+REQUEST_COUNT = Counter('total_requests', 'number of total requests', ['method', 'endpoint', 'status'])
 
-requests_duration = Histogram('requests_duration', 'requests time duration')
+REQUEST_DURATION = Histogram('requests_duration', 'requests time duration', ['method', 'endpoint'])
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,9 +42,9 @@ async def add_request_id(request: Request, call_next):
         
         logger_config.logger.info(f'Request finished. Request method: {request.method}. Request url: {request.url.path}. Status code: {response.status_code}')
     
-    requests_duration.observe(request_duration)
+    REQUEST_DURATION.labels(method = request.method, endpoint = request.url.path).observe(request_duration)
     
-    requests_count.inc()
+    REQUEST_COUNT.labels(method = request.method, endpoint = request.url.path, status = str(response.status_code)).inc()
     
     return response
 
