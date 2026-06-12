@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, Depends, HTTPException
 from routers.users import router as users_router
 from routers.transactions import router as transaction_router
 from models.users import User 
@@ -7,8 +7,10 @@ from database import Base, engine
 from contextlib import asynccontextmanager
 import logger_config
 import uuid
-from prometheus_client import Counter, Histogram
+from prometheus_client import Counter, Histogram, generate_latest
 import time
+from sqlalchemy import text
+from core.dependencies import get_db
 
 REQUEST_COUNT = Counter('total_requests', 'number of total requests', ['method', 'endpoint', 'status'])
 
@@ -48,5 +50,23 @@ async def add_request_id(request: Request, call_next):
     
     return response
 
+@app.get('/metrics')
+def get_metrics():
+    return Response(content = generate_latest(), media_type = 'text/plain')
+
+@app.get('/health')
+def health():
+    return {'status': 'ok'}
+
+@app.get('/ready')
+def ready(db = Depends(get_db)):
+    try:
+        db.execute(text('select 1'))
+    
+    except Exception:
+        raise HTTPException(status_code=503, detail= {'status': 'not ready', 'database': 'unavailable'})
+    
+    return {'status': 'ready'}
+    
 app.include_router(transaction_router)
 app.include_router(users_router)
