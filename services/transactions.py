@@ -48,7 +48,9 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
         if filters.end_date:
             query = query.filter(Transaction.created_at <= filters.end_date)
         
-        transactions = query.all()
+        offset = (filters.page - 1) * filters.limit
+        
+        transactions = query.offset(offset).limit(filters.limit).all()
         
         logger.bind(user_id = current_user.id).info(f'{len(transactions)} transactions fetched')
         

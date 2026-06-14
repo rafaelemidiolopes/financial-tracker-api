@@ -32,3 +32,5 @@ class TransactionFilters(BaseModel):
     max_amount: float | None = Query(None)
     start_date: datetime.datetime | None = Query(None)
     end_date: datetime.datetime | None = Query(None)
+    page: int = Query(1, ge = 1)
+    limit: int = Query(10, ge = 1, le = 20)
