@@ -41,7 +41,7 @@ def login_user(user_data: UserLogin, db: Session):
     if not user:
         logger.warning(f'Login failed. Email {user_data.email} not found.')
         
-        raise HTTPException(status_code=404, detail='Invalid credentials') 
+        raise HTTPException(status_code=401, detail='Invalid credentials') 
     
     if not verify_password(user_data.password, user.password_hash):
         logger.warning(f'Login failed. Invalid credentials for user {user.id}')
