@@ -32,7 +32,7 @@ async def add_request_id(request: Request, call_next):
     request.state.request_id = request_id
 
     with logger_config.logger.contextualize(request_id = request_id):
-        logger_config.logger.info(f'Request started. Request method: {request.method}. Request url: {request.url.path}.')
+        logger_config.logger.bind(request_method = request.method, request_url = request.url.path).info('Request started')
         
         start_endpoint_time = time.time()
     
@@ -42,7 +42,7 @@ async def add_request_id(request: Request, call_next):
         
         response.headers["X-Request-ID"] = request_id
         
-        logger_config.logger.info(f'Request finished. Request method: {request.method}. Request url: {request.url.path}. Status code: {response.status_code}')
+        logger_config.logger.bind(request_method = request.method, request_url = request.url.path).info('Request finished')
     
     REQUEST_DURATION.labels(method = request.method, endpoint = request.url.path).observe(request_duration)
     

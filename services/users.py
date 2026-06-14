@@ -11,7 +11,7 @@ def create_user(user: UserCreate, db: Session):
     email_exists = db.query(User).filter_by(email = user.email).first()
     
     if email_exists:
-        logger.warning(f'Creating user failed. email {user.email} already exists')
+        logger.bind(email = user.email).warning(f'Creating user failed. Email already exists')
         
         raise HTTPException(status_code=409, detail='Email already exists')
     
@@ -27,11 +27,11 @@ def create_user(user: UserCreate, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception('Creating user failed.')
+        logger.exception('Creating user failed')
         
         raise
     
-    logger.info(f'User created. Id user: {new_user.id}')
+    logger.bind(user_id = new_user.id).info(f'User created')
     
     return new_user
 
@@ -39,12 +39,12 @@ def login_user(user_data: UserLogin, db: Session):
     user = db.query(User).filter_by(email = user_data.email).first()
     
     if not user:
-        logger.warning(f'Login failed. Email {user_data.email} not found.')
+        logger.bind(email = user_data.email).warning(f'Login failed. Invalid credentials')
         
         raise HTTPException(status_code=401, detail='Invalid credentials') 
     
     if not verify_password(user_data.password, user.password_hash):
-        logger.warning(f'Login failed. Invalid credentials for user {user.id}')
+        logger.bind(user_id = user.id).warning(f'Login failed. Invalid credentials')
         
         raise HTTPException(status_code=401, detail='Invalid credentials! ')
     
@@ -59,7 +59,7 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
         new_email_exists = db.query(User).filter_by(email = new_data.email).first()
     
         if new_email_exists and new_email_exists.id != user.id:
-            logger.warning(f'Update user failed. Email {new_data.email} already used')
+            logger.bind(email = new_data.email).warning(f'Update user failed. Email already used')
             
             raise HTTPException(status_code=409, detail='Email already exists')
         
@@ -76,11 +76,11 @@ def update_me(new_data: UpdateUser, user: User, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception(f'Update user failed. User id: {user.id}')
+        logger.bind(user_id = user.id).exception(f'Update user failed')
         
         raise
     
-    logger.info(f'User {user.id} updated')
+    logger.bind(user_id = user.id).info(f'User updated')
     
     return user
 
@@ -95,10 +95,10 @@ def update_password(new_password: UpdatePassword, user: User, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception(f'Update password failed. User id: {user.id}')
+        logger.bind(user_id = user.id).exception(f'Update password failed')
         
         raise
     
-    logger.info(f'Password updated by user {user.id}')
+    logger.bind(user_id = user.id).info(f'Password updated')
     
     return user

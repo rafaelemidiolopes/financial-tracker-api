@@ -15,12 +15,12 @@ def create_transaction(current_user, data: TransactionCreate, db: Session):
     
         db.refresh(new_transaction)
         
-        logger.info(f'Transaction created. Id transaction: {new_transaction.id}. User id: {new_transaction.user_id}')
+        logger.bind(new_transaction_id = new_transaction.id, user_id = new_transaction.user_id).info(f'Transaction created')
     
     except Exception:
         db.rollback()
         
-        logger.exception(f'Error creating transaction. User: {current_user.id}.')
+        logger.bind(user_id = current_user.id).exception(f'Error creating transaction')
         
         raise
     
@@ -50,12 +50,12 @@ def get_transactions(filters: TransactionFilters, current_user: User, db: Sessio
         
         transactions = query.all()
         
-        logger.info(f'{len(transactions)} transactions fetched for user {current_user.id}')
+        logger.bind(user_id = current_user.id).info(f'{len(transactions)} transactions fetched')
         
         return transactions
     
     except Exception:
-        logger.exception(f'Error when viewing transactions! User: {current_user.id}')
+        logger.bind(current_user.id).exception(f'Error when viewing transactions')
         
         raise
 
@@ -63,7 +63,7 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
     transaction = db.query(Transaction).filter_by(id = transaction_id, user_id = current_user.id).first()
     
     if not transaction:
-        logger.warning(f'Transaction {transaction_id} not found for user {current_user.id}')
+        logger.bind(transaction_id = transaction_id, user_id = current_user.id).warning(f'Transaction not found')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
@@ -77,12 +77,12 @@ def update_transaction(transaction_id: int, new_data: TransactionUpdate, current
         
         db.refresh(transaction)
         
-        logger.info(f'Transaction {transaction.id} updated by user {current_user.id}!')
+        logger.bind(transaction_id = transaction_id, user_id = current_user.id).info(f'Transaction updated')
         
     except Exception:
         db.rollback()
         
-        logger.exception(f'Error when updating transaction. User: {current_user.id}')
+        logger.bind(user_id = current_user.id).exception(f'Error when updating transaction')
         
         raise
     
@@ -92,7 +92,7 @@ def delete_transaction(transaction_id: int, current_user: User, db: Session):
     transaction = db.query(Transaction).filter_by(id = transaction_id, user_id = current_user.id).first()
     
     if not transaction:
-        logger.warning(f'Transaction {transaction_id} not found for user {current_user.id}')
+        logger.bind(transaction_id = transaction_id, user_id = current_user.id).warning(f'Transaction not found')
         
         raise HTTPException(status_code=404, detail='Transaction not found! ')
     
@@ -104,8 +104,8 @@ def delete_transaction(transaction_id: int, current_user: User, db: Session):
     except Exception:
         db.rollback()
         
-        logger.exception(f'Error when delete transaction {transaction.id}. User: {current_user.id}')
+        logger.bind(transaction_id = transaction_id, user_id = current_user.id).exception(f'Error when delete transaction')
         
         raise
     
-    logger.info(f'Transaction {transaction.id} deleted by {current_user.id}! ')
+    logger.bind(transaction_id = transaction_id, user_id = current_user.id).info(f'Transaction deleted')
