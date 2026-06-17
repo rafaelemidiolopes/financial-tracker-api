@@ -37,7 +37,7 @@ def test_login_user_success_case():
 def test_login_with_inexistent_email_case():
     response = client.post('/login', json = {"email": "inexistent_email@test.com", "password": "321"})
     
-    assert response.status_code == 404
+    assert response.status_code == 401
     assert response.json()['detail'] == 'Invalid credentials'
     
 def test_login_with_wrong_password():
