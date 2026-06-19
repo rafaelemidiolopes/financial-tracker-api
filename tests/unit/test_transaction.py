@@ -28,6 +28,8 @@ def test_get_transactions_success_case():
     
     fake_query.filter_by.return_value = fake_query
     fake_query.filter.return_value = fake_query
+    fake_query.offset.return_value = fake_query
+    fake_query.limit.return_value = fake_query
     fake_query.all.return_value = ['fake_transaction']
     
     fake_db.query.return_value = fake_query
@@ -49,7 +51,7 @@ def test_get_transations_without_filters_success_case():
     fake_user = MagicMock()
     fake_user.id = 1
     
-    fake_db.query.return_value.filter_by.return_value.all.return_value = ['fake transaction']
+    fake_db.query.return_value.filter_by.return_value.offset.return_value.limit.return_value.all.return_value = ['fake transaction']
     
     result = get_transactions(fake_filters, fake_user, fake_db)
     
