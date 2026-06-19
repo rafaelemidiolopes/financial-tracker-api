@@ -50,7 +50,7 @@ def login_user(user_data: UserLogin, db: Session):
     
     access_token = create_access_token({'sub': str(user.id)})
     
-    logger.info(f'Access token created for user {user.id}')
+    logger.bind(user_id = user.id).info('Access token created')
     
     return TokenResponse(access_token=access_token, token_type='bearer')
 
