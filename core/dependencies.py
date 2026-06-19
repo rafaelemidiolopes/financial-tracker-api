@@ -23,7 +23,7 @@ def get_current_user(db: Session = Depends(get_db), token = Depends(oauth2)):
         user = db.query(User).filter_by(id = int(payload['sub'])).first()
 
         if not user:
-            logger.warning(f'Error when getting current user. User {payload["sub"]} not found')
+            logger.bind(sub = payload['sub']).warning('Error when getting current user. User not found')
             
             raise HTTPException(status_code=404, detail='User not found! ')
     
@@ -42,6 +42,6 @@ def get_current_user(db: Session = Depends(get_db), token = Depends(oauth2)):
         
         raise HTTPException(status_code=401, detail='invalid decode error', headers={'WWW-Authenticate': 'Bearer'})
     
-    logger.info(f'User {user.id} authenticated successfully')
+    logger.bind(user_id = user.id).info('User authenticated successfully')
     
     return user
