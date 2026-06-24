@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
 from core.config import SECRET_KEY, ALGORITHM, TOKEN_EXPIRE_TIME
 
-load_dotenv()
 
 oauth2 = OAuth2PasswordBearer(tokenUrl='/user')
 
