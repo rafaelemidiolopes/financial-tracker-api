@@ -1,20 +1,19 @@
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
 from jwt import encode
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from fastapi.security import OAuth2PasswordBearer
 from core.config import SECRET_KEY, ALGORITHM, TOKEN_EXPIRE_TIME
 
-
 oauth2 = OAuth2PasswordBearer(tokenUrl='/user')
 
-pwd_context = CryptContext(schemes=['bcrypt'])
+password_hasher = PasswordHash.recommended()
 
 def hash_password(password: str):
-    return pwd_context.hash(password)
+    return password_hasher.hash(password)
 
 def verify_password(password: str, hashed_password: str):
-    return pwd_context.verify(password, hashed_password)
+    return password_hasher.verify(password, hashed_password)
 
 def create_access_token(user_data: dict):
     payload = user_data.copy()
